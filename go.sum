@@ -1,0 +1,4 @@
+github.com/webpkg/cmd v0.0.0-20191202021112-996b688eb0c4 h1:oIF9B/tmpefxYQsTjOecZA/0t8EHMS9Kj69KDzzy8Tg=
+github.com/webpkg/cmd v0.0.0-20191202021112-996b688eb0c4/go.mod h1:2fnYLUyWRnrGci2hskOOn9XNm3FvKgJ730xMu3r27qU=
+github.com/webpkg/web v0.0.0-20191202020730-90f3293bd6e5 h1:MxedecfV5tjNatROJnwbXBqdQi3oqjKJwDkmVDK4j/k=
+github.com/webpkg/web v0.0.0-20191202020730-90f3293bd6e5/go.mod h1:0LelOclkIkEe8Ff6BWPxa8po2xvaPob0fkYN1HIhPTw=
