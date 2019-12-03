@@ -55,3 +55,84 @@ func (uc *userController) Destroy(ctx *web.Context) {
 }
 
 ```
+
+### Route
+```go
+package route
+
+import (
+	"sync"
+
+	"github.com/webpkg/web"
+	"github.com/webpkg/api/controller"
+)
+
+var (
+	_once sync.Once
+)
+
+// Init config
+func Init(app *web.Application) {
+
+	_once.Do(func() {
+		app.Resource("/user/", controller.CreateUserController())
+	})
+}
+
+```
+
+### Contract
+```go
+package contract
+
+import "github.com/webpkg/api/model"
+
+// UserRepository interface
+type UserRepository interface {
+	Find(id uint64) (*model.User, error)
+	Create(user *model.User) error
+}
+
+```
+
+### Repository
+```go
+package repository
+
+import (
+	"sync"
+
+	"github.com/webpkg/api/contract"
+	"github.com/webpkg/api/model"
+)
+
+var (
+	_userRepository     contract.UserRepository
+	_onceUserRepository sync.Once
+)
+
+// CreateUserRepository return contract.IUserRepository
+func CreateUserRepository() contract.UserRepository {
+
+	_onceUserRepository.Do(func() {
+		_userRepository = &UserRepository{}
+	})
+
+	return _userRepository
+}
+
+// UserRepository struct
+type UserRepository struct {
+}
+
+// Find user by id
+func (u *UserRepository) Find(id uint64) (*model.User, error) {
+	return nil, nil
+}
+
+// Create user
+func (u *UserRepository) Create(user *model.User) error {
+	return nil
+}
+
+```
