@@ -1,6 +1,6 @@
 # api
 
-#### a start point for your go project base on webpkg/web.
+a start point for your go project base on webpkg/web.
 
 ### Controller
 ```go
