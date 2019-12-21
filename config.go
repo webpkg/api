@@ -4,7 +4,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/webpkg/web"
+	"github.com/webpkg/api/config"
+	"github.com/webpkg/api/helper"
 	"github.com/webpkg/cmd"
 )
 
@@ -35,9 +36,11 @@ var (
 	}
 )
 
-// config struct
-type config struct {
-	web.Config
+// Config struct
+type Config struct {
+	Server   *config.ServerConfig
+	Database *config.DatabaseCluster
+	Redis    *config.RedisConfig
 }
 
 func runConfig(cmd *cmd.Command, args []string) {
@@ -52,9 +55,9 @@ func runConfig(cmd *cmd.Command, args []string) {
 // writeConfig create new config.json at $configDir
 func writeConfig() {
 
-	cfg := &config{}
+	cfg := &Config{}
 
-	cfg.Server = &web.ServerConfig{
+	cfg.Server = &config.ServerConfig{
 		Addr:              _addr,
 		ReadTimeout:       _readTimeout,
 		ReadHeaderTimeout: _readHeaderTimeout,
@@ -62,7 +65,7 @@ func writeConfig() {
 		IdleTimeout:       _idleTimeout,
 	}
 
-	cfg.Database = &web.DatabaseCluster{
+	cfg.Database = &config.DatabaseCluster{
 		Driver:    _connection,
 		Database:  _database,
 		Username:  _username,
@@ -71,12 +74,12 @@ func writeConfig() {
 		Collation: _collation,
 	}
 
-	cfg.Database.Write = &web.DatabaseHostConfig{
+	cfg.Database.Write = &config.DatabaseHostConfig{
 		Host: _host,
 		Port: _port,
 	}
 
-	cfg.Database.Read = &[]web.DatabaseHostConfig{
+	cfg.Database.Read = &[]config.DatabaseHostConfig{
 		{
 			Host: _host,
 			Port: _port,
@@ -87,16 +90,16 @@ func writeConfig() {
 		},
 	}
 
-	if err := web.WriteJSON(cfg, _configFile, _webForce); err != nil {
+	if err := helper.WriteJSON(cfg, _configFile, _webForce); err != nil {
 		log.Printf("config: %v", err)
 	}
 }
 
-func readConfig() (*config, error) {
+func readConfig() (*Config, error) {
 
-	c := &config{}
+	c := &Config{}
 
-	err := web.ReadJSON(c, _configFile)
+	err := helper.ReadJSON(c, _configFile)
 
 	if err != nil {
 		return nil, err

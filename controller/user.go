@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"sync"
 
 	"github.com/webpkg/web"
@@ -32,7 +33,10 @@ func (uc *userController) Index(ctx *web.Context) {
 
 // Create create user
 func (uc *userController) Create(ctx *web.Context) {
-	ctx.WriteString("user.create")
+
+	name := ctx.Form("name")
+	log.Printf("%s", name)
+	ctx.WriteString(name)
 }
 
 // Detail get user detail by id

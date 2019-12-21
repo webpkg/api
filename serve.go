@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/webpkg/api/repository"
 	"github.com/webpkg/api/route"
@@ -31,5 +32,10 @@ func runServe(cmd *cmd.Command, args []string) {
 	repository.Init(cfg.Database)
 	route.Init(app)
 
-	log.Fatal(app.ListenAndServe(cfg.Server))
+	log.Fatal(app.ListenAndServe(cfg.Server.Addr, func(srv *http.Server) {
+		srv.ReadTimeout = cfg.Server.ReadTimeout
+		srv.ReadHeaderTimeout = cfg.Server.ReadHeaderTimeout
+		srv.WriteTimeout = cfg.Server.WriteTimeout
+		srv.IdleTimeout = cfg.Server.IdleTimeout
+	}))
 }
