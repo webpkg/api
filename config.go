@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/webpkg/api/config"
 	"github.com/webpkg/api/helper"
@@ -10,12 +11,7 @@ import (
 )
 
 const (
-	_configFile        = "config.json"
-	_addr              = "127.0.0.1:8443"
-	_readTimeout       = 32
-	_readHeaderTimeout = 8
-	_writeTimeout      = 32
-	_idleTimeout       = 8
+	_configFile = "config.json"
 
 	_connection = "mysql"
 	_host       = "127.0.0.1"
@@ -58,11 +54,11 @@ func writeConfig() {
 	cfg := &Config{}
 
 	cfg.Server = &config.ServerConfig{
-		Addr:              _addr,
-		ReadTimeout:       _readTimeout,
-		ReadHeaderTimeout: _readHeaderTimeout,
-		WriteTimeout:      _writeTimeout,
-		IdleTimeout:       _idleTimeout,
+		Addr:              "127.0.0.1:8443",
+		ReadTimeout:       32 * time.Second,
+		ReadHeaderTimeout: 8 * time.Second,
+		WriteTimeout:      32 * time.Second,
+		IdleTimeout:       8 * time.Second,
 	}
 
 	cfg.Database = &config.DatabaseCluster{
