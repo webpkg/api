@@ -15,52 +15,56 @@ replace github.com/webpkg/api to your module path
 package controller
 
 import (
+	"log"
 	"sync"
 
 	"github.com/webpkg/web"
 )
 
 var (
-	_userController     web.Controller
+	_userController     *UserController
 	_onceUserController sync.Once
 )
 
-// CreateUserController return web.Controller
-func CreateUserController() web.Controller {
+// CreateUserController return *UserController
+func CreateUserController() *UserController {
 
 	_onceUserController.Do(func() {
-		_userController = &userController{}
+		_userController = &UserController{}
 	})
 
 	return _userController
 }
 
-// userController struct
-type userController struct {
+// UserController struct
+type UserController struct {
 }
 
 // Index get users
-func (uc *userController) Index(ctx *web.Context) {
+func (uc *UserController) Index(ctx *web.Context) {
 	ctx.WriteString("user.index")
 }
 
 // Create create user
-func (uc *userController) Create(ctx *web.Context) {
-	ctx.WriteString("user.create")
+func (uc *UserController) Create(ctx *web.Context) {
+
+	name := ctx.Form("name")
+	log.Printf("%s", name)
+	ctx.WriteString(name)
 }
 
 // Detail get user detail by id
-func (uc *userController) Detail(ctx *web.Context) {
+func (uc *UserController) Detail(ctx *web.Context) {
 	ctx.WriteString("user.detail")
 }
 
 // Update update user by id
-func (uc *userController) Update(ctx *web.Context) {
+func (uc *UserController) Update(ctx *web.Context) {
 	ctx.WriteString("user.update")
 }
 
 // Destroy delete user by id
-func (uc *userController) Destroy(ctx *web.Context) {
+func (uc *UserController) Destroy(ctx *web.Context) {
 	ctx.WriteString("user.destroy")
 }
 
@@ -73,8 +77,8 @@ package route
 import (
 	"sync"
 
-	"github.com/webpkg/web"
 	"github.com/webpkg/api/controller"
+	"github.com/webpkg/web"
 )
 
 var (
@@ -85,7 +89,13 @@ var (
 func Init(app *web.Application) {
 
 	_once.Do(func() {
-		app.Resource("/user/", controller.CreateUserController())
+		user := controller.CreateUserController()
+		app.Get("/user/", user.Index)
+		app.Post("/user/", user.Create)
+		app.Get("/user/:id", user.Detail)
+		app.Patch("/user/:id", user.Update)
+		app.Put("/user/:id", user.Update)
+		app.Delete("/user/:id", user.Destroy)
 	})
 }
 
