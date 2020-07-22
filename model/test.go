@@ -14,12 +14,12 @@ func CreateTest() *Test {
 // @table tests
 type Test struct {
 	// @column PrimaryKey
-    ID uint64 `json:"id"`
+	ID uint64 `json:"id"`
 	// @column $dataType=varchar(127)
-	TestName string `json:"testName"`
-	TestDescription *string `json:"testDescription"`
-	CreatedAt *time.Time `json:"-"`
-	UpdatedAt *time.Time `json:"-"`
+	TestName        string     `json:"testName"`
+	TestDescription *string    `json:"testDescription"`
+	CreatedAt       *time.Time `json:"-"`
+	UpdatedAt       *time.Time `json:"-"`
 }
 
 // CreateTestCollection return *TestCollection
