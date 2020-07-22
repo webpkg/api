@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/webpkg/cmd"
+	_ "github.com/webpkg/mysql"
 )
 
 var (

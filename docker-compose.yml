@@ -1,0 +1,41 @@
+version: "3"
+services:
+
+    redis:
+      image: redis:alpine
+      container_name: redis
+      restart: always
+      ports:
+        - "6379"
+
+    database:
+      image: mysql:5.7
+      container_name: mysql
+      volumes:
+        - data:/var/lib/mysql
+      restart: always
+      environment:
+        - MYSQL_ROOT_PASSWORD=nprr0IYcO
+        - MYSQL_DATABASE=api
+        - MYSQL_USER=api
+        - MYSQL_PASSWORD=ba3ljA1M25hepA
+      ports:
+        - "3306:3306"
+
+    web:
+      build:
+        context: ./
+      image: hub.hirefromchina.com/api
+      container_name: web
+      depends_on:
+        - database
+        - redis
+      working_dir: /app
+      volumes:
+          - .:/app
+      restart: always
+      ports:
+       - "80:8443"
+
+volumes:
+  data:

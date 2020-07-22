@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"log"
-	"time"
+	"path/filepath"
 
 	"github.com/webpkg/api/config"
 	"github.com/webpkg/api/helper"
@@ -11,16 +11,8 @@ import (
 )
 
 const (
-	_configFile = "config.json"
-
-	_connection = "mysql"
-	_host       = "127.0.0.1"
-	_port       = 3306
-	_database   = "webgo"
-	_username   = "webgo"
-	_password   = "webgo@8443"
-	_charset    = "utf8"
-	_collation  = "utf8_general_ci"
+	_configFile   = "config.json"
+	_idConfigFile = "app/keys/id.json"
 )
 
 var (
@@ -32,11 +24,13 @@ var (
 	}
 )
 
-// Config struct
-type Config struct {
+// WebConfig struct
+type WebConfig struct {
+	App      *config.AppConfig
 	Server   *config.ServerConfig
 	Database *config.DatabaseCluster
-	Redis    *config.RedisConfig
+	Auth     *config.AuthConfig
+	Rbac     *config.RbacConfig
 }
 
 func runConfig(cmd *cmd.Command, args []string) {
@@ -51,49 +45,26 @@ func runConfig(cmd *cmd.Command, args []string) {
 // writeConfig create new config.json at $configDir
 func writeConfig() {
 
-	cfg := &Config{}
+	cfg := &WebConfig{}
 
-	cfg.Server = &config.ServerConfig{
-		Addr:              "127.0.0.1:8443",
-		ReadTimeout:       32 * time.Second,
-		ReadHeaderTimeout: 8 * time.Second,
-		WriteTimeout:      32 * time.Second,
-		IdleTimeout:       8 * time.Second,
-	}
+	cfg.App = config.CreateAppConfig()
 
-	cfg.Database = &config.DatabaseCluster{
-		Driver:    _connection,
-		Database:  _database,
-		Username:  _username,
-		Password:  _password,
-		Charset:   _charset,
-		Collation: _collation,
-	}
+	cfg.Server = config.CreateServerConfig()
 
-	cfg.Database.Write = &config.DatabaseHostConfig{
-		Host: _host,
-		Port: _port,
-	}
+	cfg.Database = config.CreateDatabaseClusterConfig()
 
-	cfg.Database.Read = &[]config.DatabaseHostConfig{
-		{
-			Host: _host,
-			Port: _port,
-		},
-		{
-			Host: _host,
-			Port: _port,
-		},
-	}
+	cfg.Auth = config.CreateAuthConfig()
+
+	cfg.Rbac = config.CreateRbacConfig()
 
 	if err := helper.WriteJSON(cfg, _configFile, _webForce); err != nil {
 		log.Printf("config: %v", err)
 	}
 }
 
-func readConfig() (*Config, error) {
+func readConfig() (*WebConfig, error) {
 
-	c := &Config{}
+	c := &WebConfig{}
 
 	err := helper.ReadJSON(c, _configFile)
 
@@ -113,5 +84,42 @@ func readConfig() (*Config, error) {
 		return nil, errors.New("config.Database.Write is nil")
 	}
 
+	if c.Auth == nil {
+		return nil, errors.New("config.Auth is nil")
+	}
+
+	if c.Rbac == nil {
+		return nil, errors.New("config.Rbac is nil")
+	}
+
 	return c, nil
+}
+
+func readIDConfig(dir string) (*config.IDConfig, error) {
+
+	filename := filepath.Join(dir, _idConfigFile)
+
+	c := &config.IDConfig{}
+
+	if helper.FileExist(filename) {
+
+		err := helper.ReadJSON(c, filename)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return c, nil
+}
+
+func writeIDConfig(dir string, kc *config.IDConfig) error {
+
+	filename := filepath.Join(dir, _idConfigFile)
+
+	if err := helper.WriteJSON(kc, filename, true); err != nil {
+		return err
+	}
+
+	return nil
 }
