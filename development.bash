@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
 
+# gofmt -w .
+
 make clean
 
 make
 
-bin/webgo-darwin-amd64 config
-bin/webgo-darwin-amd64 serve
+docker-compose build
+docker-compose up -d

@@ -15,10 +15,10 @@ services:
         - data:/var/lib/mysql
       restart: always
       environment:
-        - MYSQL_ROOT_PASSWORD=nprr0IYcO
+        - MYSQL_ROOT_PASSWORD=xNUvRi3nfuU
         - MYSQL_DATABASE=api
         - MYSQL_USER=api
-        - MYSQL_PASSWORD=ba3ljA1M25hepA
+        - MYSQL_PASSWORD=Rsh4qle$Apm
       ports:
         - "3306:3306"
 
