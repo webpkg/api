@@ -47,6 +47,14 @@ Authorization: Bearer $ACCESSTOKEN
 ```
 
 --------------------
+### Query:
+
+| QueryName | Required | Type |
+|-----------|---------:|-----:|
+|  key      |    No    |string|
+|  page     |    No    |  int |
+|  pagesize |    No    |  int |
+
 ### Data:
 
 | AttributeName | Required | Type |
