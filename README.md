@@ -452,3 +452,15 @@ func (r *TestRepository) DestroyTest(id uint64) (int64, error) {
 }
 
 ```
+
+### Doc
+
+[Get Tests](https://webpkg.github.io/api/test/index.html)
+
+[Get Test](https://webpkg.github.io/api/test/detail.html)
+
+[Create Test](https://webpkg.github.io/api/test/create.html)
+
+[Updata Test](https://webpkg.github.io/api/test/update.html)
+
+[Destroy Test](https://webpkg.github.io/api/test/destroy.html)
