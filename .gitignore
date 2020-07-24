@@ -12,4 +12,5 @@
 *.out
 
 bin/
+storage/
 config.json
