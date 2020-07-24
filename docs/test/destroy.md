@@ -39,6 +39,7 @@ Authorization: Bearer $ACCESSTOKEN
 ```
 
 --------------------
+
 ### Where:
 
 | AttributeName | Required | Type |
