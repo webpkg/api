@@ -39,20 +39,8 @@ Authorization: Bearer $ACCESSTOKEN
 ```
 
 --------------------
+### Where:
 
-### Test
-```go
-// Test model
-type Test struct {
-	// @column $columnName=id,$dataType=bigint(20) unsigned,PrimaryKey
-	ID uint64 `json:"id"`
-	// @column $columnName=test_name,$dataType=varchar(127)
-	TestName string `json:"testName"`
-	// @column $columnName=test_description,$dataType=varchar(255)
-	TestDescription *string `json:"testDescription"`
-	// @column $columnName=created_at,$dataType=timestamp
-	CreatedAt *time.Time `json:"createdAt"`
-	// @column $columnName=updated_at,$dataType=timestamp
-	UpdatedAt *time.Time `json:"updatedAt"`
-}
-```
+| AttributeName | Required | Type |
+|---------------|---------:|-----:|
+|id|Yes|uint64|
