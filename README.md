@@ -453,14 +453,313 @@ func (r *TestRepository) DestroyTest(id uint64) (int64, error) {
 
 ```
 
-### Doc
+--------------------------------------------------
+# Api Doc
 
-[Get Tests](https://webpkg.github.io/api/test/index.html)
+## Get Tests
 
-[Get Test](https://webpkg.github.io/api/test/detail.html)
+### URL
 
-[Create Test](https://webpkg.github.io/api/test/create.html)
+  GET /test/?key=&page=1&pagesize=20
 
-[Updata Test](https://webpkg.github.io/api/test/update.html)
+### Header
+```bash
+Content-Type: application/json
+Authorization: Bearer $ACCESSTOKEN
+```
 
-[Destroy Test](https://webpkg.github.io/api/test/destroy.html)
+### Success Response:
+#### Status Code: 200
+#### Data (TestCollection):
+```json
+[
+    {
+        "id": "uint64",
+        "testName": "string",
+        "testDescription": "string",
+        "createdAt": "time.Time",
+        "updatedAt": "time.Time"
+    }
+]
+```
+
+### Error Response:
+#### Status Code: 400
+#### Data:
+```json
+"error message"
+```
+
+### Error Response:
+#### Status Code: 401
+#### Data:
+```json
+"invalid token"
+```
+
+### Error Response:
+#### Status Code: 403
+#### Data:
+```json
+"permission denied"
+```
+
+--------------------
+
+### Query:
+
+| QueryName | Required | Type |
+|-----------|---------:|-----:|
+|  key      |    No    |string|
+|  page     |    No    |  int |
+|  pagesize |    No    |  int |
+
+### Data (Test):
+
+| AttributeName | Required | Type |
+|---------------|---------:|-----:|
+|id|Yes|uint64|
+|testName|Yes|string|
+|testDescription|No|string|
+|createdAt|No|time.Time|
+|updatedAt|No|time.Time|
+
+--------------------------
+## Get Test
+
+### URL
+
+  GET /test/:id
+
+### Header
+```bash
+Content-Type: application/json
+Authorization: Bearer $ACCESSTOKEN
+```
+
+### Success Response:
+#### Status Code: 200
+#### Data (Test):
+```json
+{
+    "id": "uint64",
+    "testName": "string",
+    "testDescription": "string",
+    "createdAt": "time.Time",
+    "updatedAt": "time.Time"
+}
+```
+
+### Error Response:
+#### Status Code: 400
+#### Data:
+```json
+"error message"
+```
+
+### Error Response:
+#### Status Code: 401
+#### Data:
+```json
+"invalid token"
+```
+
+### Error Response:
+#### Status Code: 403
+#### Data:
+```json
+"permission denied"
+```
+
+--------------------
+
+### Data (Test):
+
+| AttributeName | Required | Type |
+|---------------|---------:|-----:|
+|id|Yes|uint64|
+|testName|Yes|string|
+|testDescription|No|string|
+|createdAt|No|time.Time|
+|updatedAt|No|time.Time|
+
+--------------------------------
+
+## Create Test
+
+### URL
+
+  POST /test/
+
+### Header
+```bash
+Content-Type: application/json
+Authorization: Bearer $ACCESSTOKEN
+```
+
+### Payload (Test)
+```json
+{
+    "id": "uint64",
+    "testName": "string",
+    "testDescription": "string",
+    "createdAt": "time.Time"
+}
+```
+
+### Success Response:
+#### Status Code: 200
+#### Data (id uint64):
+```json
+
+```
+
+### Error Response:
+#### Status Code: 400
+#### Data:
+```json
+"error message"
+```
+
+### Error Response:
+#### Status Code: 401
+#### Data:
+```json
+"invalid token"
+```
+
+### Error Response:
+#### Status Code: 403
+#### Data:
+```json
+"permission denied"
+```
+
+--------------------
+
+### Data (Test):
+
+| AttributeName | Required | Type | Validator |
+|---------------|---------:|-----:|----------:|
+|id|Yes|uint64||
+|testName|Yes|string||
+|testDescription|No|string||
+|createdAt|No|time.Time||
+
+-----------------------------
+
+## Updata Test
+
+### URL
+
+  PUT /test/:id
+
+### Header
+```bash
+Content-Type: application/json
+Authorization: Bearer $ACCESSTOKEN
+```
+
+### Payload (Test)
+```json
+{
+    "id": "uint64",
+    "testName": "string",
+    "testDescription": "string",
+    "updatedAt": "time.Time"
+}
+```
+
+### Success Response:
+#### Status Code: 200
+#### Data (rowsAffected int64):
+```json
+
+```
+
+### Error Response:
+#### Status Code: 400
+#### Data:
+```json
+"error message"
+```
+
+### Error Response:
+#### Status Code: 401
+#### Data:
+```json
+"invalid token"
+```
+
+### Error Response:
+#### Status Code: 403
+#### Data:
+```json
+"permission denied"
+```
+
+--------------------
+
+### Data (Test):
+
+| AttributeName | Required | Type | Validator |
+|---------------|---------:|-----:|----------:|
+|testName|Yes|string||
+|testDescription|No|string||
+|updatedAt|No|time.Time||
+
+### Where:
+
+| AttributeName | Required | Type |
+|---------------|---------:|-----:|
+|id|Yes|uint64|
+
+--------------------------------------
+
+## Destroy Test
+
+### URL
+
+  DELETE /test/:id
+
+### Header
+```bash
+Content-Type: application/json
+Authorization: Bearer $ACCESSTOKEN
+```
+
+### Success Response:
+#### Status Code: 200
+#### Data (rowsAffected int64):
+```json
+
+```
+
+### Error Response:
+#### Status Code: 400
+#### Data:
+```json
+"error message"
+```
+
+### Error Response:
+#### Status Code: 401
+#### Data:
+```json
+"invalid token"
+```
+
+### Error Response:
+#### Status Code: 403
+#### Data:
+```json
+"permission denied"
+```
+
+--------------------
+
+### Where:
+
+| AttributeName | Required | Type |
+|---------------|---------:|-----:|
+|id|Yes|uint64|
