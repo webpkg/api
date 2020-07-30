@@ -2,6 +2,10 @@
 
 a start point for your go project base on webpkg/web.
 
+1. support one write multiple read databases
+
+2. support multiple instance whith same/different database instance
+
 ### Install
 ```bash
 git clone git@github.com:webpkg/api.git
