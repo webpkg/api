@@ -9,41 +9,36 @@ import (
 // Chain call something before next callback
 func Chain(next web.Callback, keys ...string) web.Callback {
 
-	return func(ctx *web.Context) {
+	return func(ctx *web.Context) (web.Data, error) {
 
 		before(ctx)
 
 		err := bearerAuth(ctx, keys...)
 
 		if err != nil {
-
-			if err == rbac.ErrPermissionDenied {
-				ctx.WriteHeader(403)
-			} else {
-				ctx.WriteHeader(401)
-			}
-
-			ctx.WriteJSON(err.Error())
-
-			return
+			return nil, err
 		}
 
-		next(ctx)
+		val, err := next(ctx)
 
 		after(ctx)
+
+		return val, err
 	}
 }
 
 // Direct call something before next callback
-func Direct(next web.Callback) web.Callback {
+func Direct(next web.Callback, keys ...string) web.Callback {
 
-	return func(ctx *web.Context) {
+	return func(ctx *web.Context) (web.Data, error) {
 
 		before(ctx)
 
-		next(ctx)
+		val, err := next(ctx)
 
 		after(ctx)
+
+		return val, err
 	}
 }
 
@@ -78,7 +73,7 @@ func bearerAuth(ctx *web.Context, keys ...string) error {
 	ctx.UserID = cat.UserID
 
 	if !rbac.Check(cat.Right, keys...) {
-		return rbac.ErrPermissionDenied
+		return web.ErrForbidden
 	}
 
 	return nil

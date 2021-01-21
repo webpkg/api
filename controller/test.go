@@ -29,7 +29,7 @@ type TestController struct {
 }
 
 // Index get tests
-func (c *TestController) Index(ctx *web.Context) {
+func (c *TestController) Index(ctx *web.Context) (web.Data, error) {
 	var (
 		page     int
 		pageSize int
@@ -39,43 +39,83 @@ func (c *TestController) Index(ctx *web.Context) {
 	ctx.TryParseQuery("page", &page)
 	ctx.TryParseQuery("pagesize", &pageSize)
 
-	ctx.AbortIf(proxy.GetTestsByKey(key, page, pageSize))
+	return proxy.GetTestsByKey(key, page, pageSize)
 }
 
 // Create create test
-func (c *TestController) Create(ctx *web.Context) {
+func (c *TestController) Create(ctx *web.Context) (web.Data, error) {
 	test := model.CreateTest()
-	ctx.ParseBody(test)
-	ctx.Abort(validator.CreateTest(test))
 
-	ctx.AbortIf(proxy.CreateTest(test))
+	if err := ctx.TryParseBody(test); err != nil {
+		return nil, err
+	}
+
+	if err := validator.CreateTest(test); err != nil {
+		return nil, err
+	}
+
+	return proxy.CreateTest(test)
 }
 
 // Detail get test detail by id
-func (c *TestController) Detail(ctx *web.Context) {
+func (c *TestController) Detail(ctx *web.Context) (web.Data, error) {
 	var (
 		id uint64
 	)
-	ctx.ParseParam("id", &id)
+	
+	if err := ctx.TryParseParam("id", &id); err != nil {
+		return nil, err
+	}
 
-	ctx.AbortIf(proxy.GetTest(id))
+	return proxy.GetTest(id)
 }
 
 // Update update test by id
-func (c *TestController) Update(ctx *web.Context) {
+func (c *TestController) Update(ctx *web.Context) (web.Data, error) {
 	test := model.CreateTest()
-	ctx.ParseBody(test)
-	ctx.Abort(validator.UpdateTest(test))
 
-	ctx.AbortIf(proxy.UpdateTest(test))
+	if err := ctx.TryParseBody(test); err != nil {
+		return nil, err
+	}
+	
+	if err := ctx.TryParseParam("id", &test.ID); err != nil {
+		return nil, err
+	}
+
+	if err := validator.UpdateTest(test); err != nil {
+		return nil, err
+	}
+
+	return proxy.UpdateTest(test)
+}
+
+// UpdateStatus update test status by id
+func (c *TestController) UpdateStatus(ctx *web.Context) (web.Data, error) {
+	test := model.CreateTest()
+
+	if err := ctx.TryParseBody(test); err != nil {
+		return nil, err
+	}
+	
+	if err := ctx.TryParseParam("id", &test.ID); err != nil {
+		return nil, err
+	}
+
+	if err := validator.UpdateTestStatus(test); err != nil {
+		return nil, err
+	}
+
+	return proxy.UpdateTestStatus(test)
 }
 
 // Destroy delete test by id
-func (c *TestController) Destroy(ctx *web.Context) {
+func (c *TestController) Destroy(ctx *web.Context) (web.Data, error) {
 	var (
 		id uint64
 	)
-	ctx.ParseParam("id", &id)
+	if err := ctx.TryParseParam("id", &id); err != nil {
+		return nil, err
+	}
 
-	ctx.AbortIf(proxy.DestroyTest(id))
+	return proxy.DestroyTestSoft(id)
 }

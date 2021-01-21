@@ -23,7 +23,7 @@ func GetTest(id uint64) (*model.Test, error) {
 	return repo.GetTest(id)
 }
 
-// CreateTest ID, TestName, TestDescription, CreatedAt
+// CreateTest ID, TestName, TestDescription, Status, CreatedAt
 // return uint64, error
 func CreateTest(test *model.Test) (uint64, error) {
 	repo := repository.CreateTestRepository()
@@ -31,11 +31,19 @@ func CreateTest(test *model.Test) (uint64, error) {
 }
 
 // UpdateTest return rowsAffected, error
-// SET TestName, TestDescription, UpdatedAt
+// SET TestName, TestDescription, Status, UpdatedAt
 // WHERE ID
 func UpdateTest(test *model.Test) (int64, error) {
 	repo := repository.CreateTestRepository()
 	return repo.UpdateTest(test)
+}
+
+// UpdateTestStatus return rowsAffected, error
+// SET status
+// WHERE ID
+func UpdateTestStatus(test *model.Test) (int64, error) {
+	repo := repository.CreateTestRepository()
+	return repo.UpdateTestStatus(test)
 }
 
 // DestroyTest return rowsAffected, error
@@ -43,4 +51,11 @@ func UpdateTest(test *model.Test) (int64, error) {
 func DestroyTest(id uint64) (int64, error) {
 	repo := repository.CreateTestRepository()
 	return repo.DestroyTest(id)
+}
+
+// DestroyTestSoft return rowsAffected, error
+// WHERE id uint64
+func DestroyTestSoft(id uint64) (int64, error) {
+	repo := repository.CreateTestRepository()
+	return repo.DestroyTestSoft(id)
 }

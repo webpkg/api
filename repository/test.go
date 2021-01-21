@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	_testID             uint64
 	_testRepository     contract.TestRepository
 	_onceTestRepository sync.Once
 )
@@ -19,8 +20,12 @@ func CreateTestRepository() contract.TestRepository {
 	_onceTestRepository.Do(func() {
 		_testRepository = &TestRepository{}
 
-		if IDConfig().TestID == 0 {
-			IDConfig().TestID = AppConfig().AppID - AppConfig().AppNum
+		if _testID == 0 {
+			_testID, _ = max("tests", "id")
+
+			if _testID == 0 {
+				_testID = WebConfig().App.AppID - WebConfig().App.AppNum
+			}
 		}
 	})
 
@@ -33,14 +38,14 @@ type TestRepository struct {
 
 // CreateTestID generate a new testID
 func (r *TestRepository) CreateTestID() uint64 {
-	return atomic.AddUint64(&IDConfig().TestID, AppConfig().AppNum)
+	return atomic.AddUint64(&_testID, WebConfig().App.AppNum)
 }
 
 // GetTestsByKey get tests by key
 func (r *TestRepository) GetTestsByKey(key string, page int, pageSize int) (*model.TestCollection, error) {
-	sql := "SELECT `id`, `test_name`, `test_description`, `created_at`, `updated_at` " +
+	sqlx := "SELECT `id`, `test_name`, `test_description`, `status`, `created_at`, `updated_at` " +
 		"FROM `tests` " +
-		"WHERE `test_name` like ? " +
+		"WHERE `test_name` like ? and `status` > 0 " +
 		"limit ? offset ? "
 
 	key = "%" + key + "%"
@@ -57,7 +62,7 @@ func (r *TestRepository) GetTestsByKey(key string, page int, pageSize int) (*mod
 		offset = (page - 1) * pageSize
 	}
 
-	rows, err := query(sql, key, pageSize, offset)
+	rows, err := query(sqlx, key, pageSize, offset)
 
 	if err != nil {
 		return nil, err
@@ -71,7 +76,7 @@ func (r *TestRepository) GetTestsByKey(key string, page int, pageSize int) (*mod
 
 		test := model.CreateTest()
 
-		err := rows.Scan(&test.ID, &test.TestName, &test.TestDescription, &test.CreatedAt, &test.UpdatedAt)
+		err := rows.Scan(&test.ID, &test.TestName, &test.TestDescription, &test.Status, &test.CreatedAt, &test.UpdatedAt)
 
 		if err != nil {
 			return nil, err
@@ -85,16 +90,16 @@ func (r *TestRepository) GetTestsByKey(key string, page int, pageSize int) (*mod
 
 // GetTest by id uint64
 func (r *TestRepository) GetTest(id uint64) (*model.Test, error) {
-	sql := "SELECT `id`, `test_name`, `test_description`, `created_at`, `updated_at` " +
+	sqlx := "SELECT `id`, `test_name`, `test_description`, `status`, `created_at`, `updated_at` " +
 		"FROM `tests` " +
-		"WHERE `id` = ? " +
+		"WHERE `id` = ? and `status` > 0 " +
 		"limit 1 "
 
-	row := queryRow(sql, id)
+	row := queryRow(sqlx, id)
 
 	test := model.CreateTest()
 
-	err := row.Scan(&test.ID, &test.TestName, &test.TestDescription, &test.CreatedAt, &test.UpdatedAt)
+	err := row.Scan(&test.ID, &test.TestName, &test.TestDescription, &test.Status, &test.CreatedAt, &test.UpdatedAt)
 
 	if err != nil {
 		return nil, err
@@ -103,18 +108,18 @@ func (r *TestRepository) GetTest(id uint64) (*model.Test, error) {
 	return test, nil
 }
 
-// CreateTest ID, TestName, TestDescription, CreatedAt
+// CreateTest ID, TestName, TestDescription, Status, CreatedAt
 // return uint64, error
 func (r *TestRepository) CreateTest(test *model.Test) (uint64, error) {
-	sql := "INSERT INTO `tests` " +
-		"(`id`, `test_name`, `test_description`, `created_at`) " +
-		"VALUES(?, ?, ?, ?) "
+	sqlx := "INSERT INTO `tests` " +
+		"(`id`, `test_name`, `test_description`, `status`, `created_at`) " +
+		"VALUES(?, ?, ?, ?, ?) "
 
 	if test.ID == 0 {
 		test.ID = r.CreateTestID()
 	}
 
-	_, err := exec(sql, test.ID, test.TestName, test.TestDescription, now())
+	_, err := exec(sqlx, test.ID, test.TestName, test.TestDescription, test.Status, now())
 
 	if err != nil {
 		return 0, err
@@ -124,14 +129,37 @@ func (r *TestRepository) CreateTest(test *model.Test) (uint64, error) {
 }
 
 // UpdateTest return rowsAffected, error
-// SET TestName, TestDescription, UpdatedAt
+// SET TestName, TestDescription, Status, UpdatedAt
 // WHERE ID
 func (r *TestRepository) UpdateTest(test *model.Test) (int64, error) {
-	sql := "UPDATE `tests` " +
-		"SET `test_name` = ?, `test_description` = ?, `updated_at` = ? " +
+	sqlx := "UPDATE `tests` " +
+		"SET `test_name` = ?, `test_description` = ?, `status` = ?, `updated_at` = ? " +
 		"WHERE `id` = ? "
 
-	result, err := exec(sql, test.TestName, test.TestDescription, now(), test.ID)
+	result, err := exec(sqlx, test.TestName, test.TestDescription, test.Status, now(), test.ID)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return 0, err
+	}
+
+	return rowsAffected, nil
+}
+
+// UpdateTestStatus return rowsAffected, error
+// SET status
+// WHERE ID
+func (r *TestRepository) UpdateTestStatus(test *model.Test) (int64, error) {
+	sqlx := "UPDATE `tests` " +
+		"SET `status` = ?, `updated_at` = ? " +
+		"WHERE `id` = ? "
+
+	result, err := exec(sqlx, test.Status, now(), test.ID)
 
 	if err != nil {
 		return 0, err
@@ -149,9 +177,30 @@ func (r *TestRepository) UpdateTest(test *model.Test) (int64, error) {
 // DestroyTest return rowsAffected, error
 // WHERE id uint64
 func (r *TestRepository) DestroyTest(id uint64) (int64, error) {
-	sql := "DELETE FROM `tests` WHERE `id` = ? "
+	sqlx := "DELETE FROM `tests` WHERE `id` = ? "
 
-	result, err := exec(sql, id)
+	result, err := exec(sqlx, id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return 0, err
+	}
+
+	return rowsAffected, nil
+}
+
+// DestroyTestSoft return rowsAffected, error
+// WHERE id uint64
+func (r *TestRepository) DestroyTestSoft(id uint64) (int64, error) {
+	sqlx := "UPDATE `tests` SET `deleted_at` = ?, status=-ABS(status) " +
+		"WHERE `id` = ? "
+
+	result, err := exec(sqlx, now(), id)
 
 	if err != nil {
 		return 0, err

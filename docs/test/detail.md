@@ -30,28 +30,14 @@ Authorization: Bearer $ACCESSTOKEN
 "error message"
 ```
 
-### Error Response:
-#### Status Code: 401
-#### Data:
-```json
-"invalid token"
-```
-
-### Error Response:
-#### Status Code: 403
-#### Data:
-```json
-"permission denied"
-```
-
 --------------------
 
 ### Data (Test):
 
-| AttributeName | Required | Type |
-|---------------|---------:|-----:|
-|id|Yes|uint64|
-|testName|Yes|string|
-|testDescription|No|string|
-|createdAt|No|time.Time|
-|updatedAt|No|time.Time|
+| AttributeName | Required | Type | Comment |
+|---------------|---------:|-----:|--------:|
+|id|Yes|uint64||
+|testName|Yes|string||
+|testDescription|No|string||
+|createdAt|No|time.Time||
+|updatedAt|No|time.Time||

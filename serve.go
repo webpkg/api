@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/webpkg/api/config"
 	"github.com/webpkg/api/rbac"
 	"github.com/webpkg/api/repository"
 	"github.com/webpkg/api/route"
@@ -23,19 +24,13 @@ var (
 
 func runServe(cmd *cmd.Command, args []string) {
 
-	cfg, err := readConfig()
+	cfg, err := config.ReadConfig()
 
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
 
-	ic, err := readIDConfig(cfg.App.StorageDir)
-
-	if err != nil {
-		log.Fatalf("keyConfig: %v", err)
-	}
-
-	repository.Init(cfg.App, ic, cfg.Database, cfg.Auth)
+	repository.Init(cfg)
 
 	app := web.Create()
 
@@ -54,10 +49,6 @@ func runServe(cmd *cmd.Command, args []string) {
 	})
 
 	repository.Close()
-
-	if err := writeIDConfig(cfg.App.StorageDir, ic); err != nil {
-		log.Printf("writeIDConfig: %v", err)
-	}
 
 	if err != nil {
 		log.Printf("serve: %v", err)

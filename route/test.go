@@ -15,5 +15,6 @@ func testRoute(app *web.Application, prefix string) {
 	app.Get(prefix+"/test/:id", middleware.Chain(test.Detail, "test.all"))
 	app.Patch(prefix+"/test/:id", middleware.Chain(test.Update, "test.edit"))
 	app.Put(prefix+"/test/:id", middleware.Chain(test.Update, "test.edit"))
+    app.Put(prefix+"/test/:id/status/", middleware.Chain(test.UpdateStatus, "test.edit"))
 	app.Delete(prefix+"/test/:id", middleware.Chain(test.Destroy, "test.edit"))
 }

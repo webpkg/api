@@ -24,20 +24,6 @@ Authorization: Bearer $ACCESSTOKEN
 "error message"
 ```
 
-### Error Response:
-#### Status Code: 401
-#### Data:
-```json
-"invalid token"
-```
-
-### Error Response:
-#### Status Code: 403
-#### Data:
-```json
-"permission denied"
-```
-
 --------------------
 
 ### Where:

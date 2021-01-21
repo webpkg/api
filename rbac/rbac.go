@@ -1,22 +1,15 @@
 package rbac
 
 import (
-	"errors"
 	"sort"
 	"strings"
 	"sync"
 
 	"github.com/webpkg/api/config"
+	"github.com/webpkg/web"
 )
 
 var (
-	// ErrInvalidToken parse token error
-	ErrInvalidToken = errors.New("invalid token")
-	// ErrTokenEmpty token value is empty
-	ErrTokenEmpty = errors.New("token value is empty")
-	// ErrPermissionDenied do not have permission access this resource
-	ErrPermissionDenied = errors.New("permission denied")
-
 	_rights *config.RbacConfig
 	_once   sync.Once
 )
@@ -34,13 +27,13 @@ func TryParseBearerToken(auth string) (string, error) {
 	const prefix = "Bearer "
 
 	if len(auth) < len(prefix) || !strings.EqualFold(auth[:len(prefix)], prefix) {
-		return "", ErrInvalidToken
+		return "", web.ErrUnauthorized
 	}
 
 	token := auth[len(prefix):]
 
 	if token == "" {
-		return "", ErrTokenEmpty
+		return "", web.ErrUnauthorized
 	}
 
 	return token, nil

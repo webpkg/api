@@ -2,5 +2,5 @@ github.com/webpkg/cmd v0.0.0-20191211064232-335f902b9b15 h1:L2oqHLhR8NHNp4Dgk6hS
 github.com/webpkg/cmd v0.0.0-20191211064232-335f902b9b15/go.mod h1:2fnYLUyWRnrGci2hskOOn9XNm3FvKgJ730xMu3r27qU=
 github.com/webpkg/mysql v0.0.0-20191205043524-2a5f67f122d9 h1:XTIV8CeM7TB9T5FpNmWQfgn39Uxyk2E1J0wTj3xHP4I=
 github.com/webpkg/mysql v0.0.0-20191205043524-2a5f67f122d9/go.mod h1:91r7fxDXuC3gfh7TVq0/AmeBMLfOIfcCO2naJcWXUcM=
-github.com/webpkg/web v0.0.4-0.20200701024721-3964cf26b673 h1:bExTAlVP3c5WYCZzYuggqR1oZ5b8g1XSOJ2c14Lnw1s=
-github.com/webpkg/web v0.0.4-0.20200701024721-3964cf26b673/go.mod h1:0LelOclkIkEe8Ff6BWPxa8po2xvaPob0fkYN1HIhPTw=
+github.com/webpkg/web v0.0.4-0.20201006143351-fc0b75929940 h1:obMImlMp3R5tkITfHgDQrzgjOMXKH7/S/qUa5OWqXRE=
+github.com/webpkg/web v0.0.4-0.20201006143351-fc0b75929940/go.mod h1:0LelOclkIkEe8Ff6BWPxa8po2xvaPob0fkYN1HIhPTw=

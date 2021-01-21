@@ -6,7 +6,7 @@ var (
 	_port       = 3306
 	_database   = "api"
 	_username   = "api"
-	_password   = "ba3ljA1M25hepA"
+	_password   = "TfqrI4KdYzjpINoR"
 	_charset    = "utf8"
 	_collation  = "utf8_general_ci"
 )

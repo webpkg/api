@@ -1,8 +1,8 @@
-## Create Test
+## Updata Test
 
 ### URL
 
-  POST /test/
+  PUT /test/:id/status/
 
 ### Header
 ```bash
@@ -13,14 +13,12 @@ Authorization: Bearer $ACCESSTOKEN
 ### Payload (Test)
 ```json
 {
-    "testName": "string",
-    "testDescription": "string"
 }
 ```
 
 ### Success Response:
 #### Status Code: 200
-#### Data (id uint64):
+#### Data (rowsAffected int64):
 ```json
 
 ```
@@ -38,5 +36,9 @@ Authorization: Bearer $ACCESSTOKEN
 
 | AttributeName | Required | Type | Validator | Comment |
 |---------------|---------:|-----:|----------:|--------:|
-|testName|Yes|string|||
-|testDescription|No|string|||
+
+### Where:
+
+| AttributeName | Required | Type |
+|---------------|---------:|-----:|
+|id|Yes|uint64|

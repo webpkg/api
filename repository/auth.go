@@ -38,7 +38,7 @@ func (r *AuthRepository) GetAuthByAccessToken(accessToken string) (*model.Auth, 
 
 	val := model.CreateAuth()
 
-	ac := AuthConfig()
+	ac := WebConfig().Auth
 
 	for _, addr := range ac.Addr {
 

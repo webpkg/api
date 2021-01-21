@@ -17,40 +17,24 @@ const (
 )
 
 var (
-	_appConfig       *config.AppConfig
-	_idConfig        *config.IDConfig
-	_databaseCluster *config.DatabaseCluster
-	_authConfig      *config.AuthConfig
-	_writeDatabase   *sql.DB
-	_readDatabases   []*sql.DB
-	_once            sync.Once
+	_webConfig     *config.WebConfig
+	_writeDatabase *sql.DB
+	_readDatabases []*sql.DB
+	_once          sync.Once
 )
 
 // Init config
-func Init(ac *config.AppConfig, ic *config.IDConfig, dc *config.DatabaseCluster, auth *config.AuthConfig) {
+func Init(WebConfig *config.WebConfig) {
 	_once.Do(func() {
-		_appConfig = ac
-		_idConfig = ic
-		_databaseCluster = dc
-		_authConfig = auth
+		_webConfig = WebConfig
 		_writeDatabase = openWriteDatabase()
 		_readDatabases = openReadDatabases()
 	})
 }
 
-// AppConfig get AppConfig
-func AppConfig() *config.AppConfig {
-	return _appConfig
-}
-
-// IDConfig get IDConfig
-func IDConfig() *config.IDConfig {
-	return _idConfig
-}
-
-// AuthConfig get AuthConfig
-func AuthConfig() *config.AuthConfig {
-	return _authConfig
+// WebConfig get WebConfig
+func WebConfig() *config.WebConfig {
+	return _webConfig
 }
 
 // Close databases
@@ -73,13 +57,13 @@ func Close() error {
 
 // openWriteDatabase of config.database.write
 func openWriteDatabase() *sql.DB {
-	db, err := sql.Open(_databaseCluster.Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
-		_databaseCluster.Username,
-		_databaseCluster.Password,
-		_databaseCluster.Write.Host,
-		_databaseCluster.Write.Port,
-		_databaseCluster.Database,
-		_databaseCluster.Charset))
+	db, err := sql.Open(_webConfig.Database.Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
+		_webConfig.Database.Username,
+		_webConfig.Database.Password,
+		_webConfig.Database.Write.Host,
+		_webConfig.Database.Write.Port,
+		_webConfig.Database.Database,
+		_webConfig.Database.Charset))
 
 	if err != nil {
 		log.Fatalf("openWriteDatabase: %s\n", err)
@@ -93,14 +77,14 @@ func openReadDatabases() []*sql.DB {
 
 	var readDatabases []*sql.DB
 
-	for _, r := range *_databaseCluster.Read {
-		db, err := sql.Open(_databaseCluster.Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
-			_databaseCluster.Username,
-			_databaseCluster.Password,
+	for _, r := range *_webConfig.Database.Read {
+		db, err := sql.Open(_webConfig.Database.Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
+			_webConfig.Database.Username,
+			_webConfig.Database.Password,
 			r.Host,
 			r.Port,
-			_databaseCluster.Database,
-			_databaseCluster.Charset))
+			_webConfig.Database.Database,
+			_webConfig.Database.Charset))
 
 		if err != nil {
 			log.Printf("openReadDatabases(%s:%d): %v\n", r.Host, r.Port, err)
@@ -129,6 +113,10 @@ func prepare(query string) (*sql.Stmt, error) {
 	return _writeDatabase.Prepare(query)
 }
 
+func txPrepare(tx *sql.Tx, query string) (*sql.Stmt, error) {
+	return tx.Prepare(query)
+}
+
 func stmtExec(stmt *sql.Stmt, args ...interface{}) (sql.Result, error) {
 	return stmt.Exec(args...)
 }
@@ -155,4 +143,26 @@ func commit(tx *sql.Tx) error {
 
 func now() *time.Time {
 	return helper.Now()
+}
+
+// max get max key value
+func max(tableName string, key string) (uint64, error) {
+
+	sqlx := "SELECT MAX(`" + key + "`) FROM `" + tableName + "` WHERE `" + key + "` % ? = ? "
+
+	row := queryRow(sqlx, WebConfig().App.AppNum, WebConfig().App.AppID)
+
+	var val *uint64
+
+	err := row.Scan(&val)
+
+	if err != nil {
+		return 0, err
+	}
+
+	if val == nil {
+		return 0, nil
+	}
+
+	return *val, nil
 }

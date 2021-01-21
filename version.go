@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	_version = "v0.0.1"
-	_osarch  string // set by ldflags
+	version    = "v0.0.1"
+	osarch     string // set by ldflags
+	gitVersion string // set by ldflags
+	buildDate  string // set by ldflags
 
 	cmdVersion = &cmd.Command{
 		Run:       runVersion,
@@ -19,5 +21,5 @@ var (
 )
 
 func runVersion(cmd *cmd.Command, args []string) {
-	fmt.Println(_version, _osarch)
+	fmt.Println(version, osarch, gitVersion, buildDate)
 }

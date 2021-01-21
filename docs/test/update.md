@@ -13,10 +13,8 @@ Authorization: Bearer $ACCESSTOKEN
 ### Payload (Test)
 ```json
 {
-    "id": "uint64",
     "testName": "string",
-    "testDescription": "string",
-    "updatedAt": "time.Time"
+    "testDescription": "string"
 }
 ```
 
@@ -34,29 +32,14 @@ Authorization: Bearer $ACCESSTOKEN
 "error message"
 ```
 
-### Error Response:
-#### Status Code: 401
-#### Data:
-```json
-"invalid token"
-```
-
-### Error Response:
-#### Status Code: 403
-#### Data:
-```json
-"permission denied"
-```
-
 --------------------
 
 ### Data (Test):
 
-| AttributeName | Required | Type | Validator |
-|---------------|---------:|-----:|----------:|
-|testName|Yes|string||
-|testDescription|No|string||
-|updatedAt|No|time.Time||
+| AttributeName | Required | Type | Validator | Comment |
+|---------------|---------:|-----:|----------:|--------:|
+|testName|Yes|string|||
+|testDescription|No|string|||
 
 ### Where:
 
