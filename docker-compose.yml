@@ -18,7 +18,7 @@ services:
         - MYSQL_ROOT_PASSWORD=xNUvRi3nfuU
         - MYSQL_DATABASE=api
         - MYSQL_USER=api
-        - MYSQL_PASSWORD=Rsh4qle$Apm
+        - MYSQL_PASSWORD=TfqrI4KdYzjpINoR
       ports:
         - "3306:3306"
 
