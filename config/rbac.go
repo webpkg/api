@@ -7,12 +7,20 @@ func CreateRbacConfig() *RbacConfig {
 
 	cfg := &RbacConfig{
 		{
-			Key:   "right.all",
+			Key:   "test.all",
 			Value: 1,
 		},
 		{
-			Key:   "right.edit",
+			Key:   "test.edit",
 			Value: 2,
+		},
+		{
+			Key:   "right.all",
+			Value: 4,
+		},
+		{
+			Key:   "right.edit",
+			Value: 8,
 		},
 	}
 
