@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gostartkit/api/config"
-	"github.com/gostartkit/api/helper"
-	"github.com/gostartkit/api/rbac"
-	"github.com/gostartkit/api/repository"
-	"github.com/gostartkit/api/route"
+	"github.com/webpkg/api/config"
+	"github.com/webpkg/api/helper"
+	"github.com/webpkg/api/rbac"
+	"github.com/webpkg/api/repository"
+	"github.com/webpkg/api/route"
 	"github.com/webpkg/cmd"
 	"github.com/webpkg/web"
 )

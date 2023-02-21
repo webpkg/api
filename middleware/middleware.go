@@ -5,8 +5,8 @@
 package middleware
 
 import (
-	"github.com/gostartkit/api/proxy"
-	"github.com/gostartkit/api/rbac"
+	"github.com/webpkg/api/proxy"
+	"github.com/webpkg/api/rbac"
 	"github.com/webpkg/web"
 )
 

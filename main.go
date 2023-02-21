@@ -5,7 +5,7 @@
 package main
 
 import (
-	"github.com/gostartkit/api/command"
+	"github.com/webpkg/api/command"
 	_ "github.com/webpkg/mysql"
 )
 

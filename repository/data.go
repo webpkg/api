@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/gostartkit/api/config"
-	"github.com/gostartkit/api/contract"
-	"github.com/gostartkit/api/model"
+	"github.com/webpkg/api/config"
+	"github.com/webpkg/api/contract"
+	"github.com/webpkg/api/model"
 	"github.com/webpkg/web"
 )
 

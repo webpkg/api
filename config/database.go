@@ -4,7 +4,7 @@
 // https://gostartkit.com
 package config
 
-import "github.com/gostartkit/api/helper"
+import "github.com/webpkg/api/helper"
 
 var (
 	_connection = "mysql"

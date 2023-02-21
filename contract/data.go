@@ -4,7 +4,7 @@
 // https://gostartkit.com
 package contract
 
-import "github.com/gostartkit/api/model"
+import "github.com/webpkg/api/model"
 
 // DataRepository interface
 type DataRepository interface {

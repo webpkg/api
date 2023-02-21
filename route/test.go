@@ -5,8 +5,8 @@
 package route
 
 import (
-	"github.com/gostartkit/api/controller"
-	"github.com/gostartkit/api/middleware"
+	"github.com/webpkg/api/controller"
+	"github.com/webpkg/api/middleware"
 	"github.com/webpkg/web"
 )
 

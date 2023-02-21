@@ -7,7 +7,7 @@ package controller
 import (
 	"sync"
 
-	"github.com/gostartkit/api/config"
+	"github.com/webpkg/api/config"
 	"github.com/webpkg/web"
 )
 

@@ -7,7 +7,7 @@ package command
 import (
 	"errors"
 
-	"github.com/gostartkit/api/config"
+	"github.com/webpkg/api/config"
 	"github.com/webpkg/cmd"
 )
 

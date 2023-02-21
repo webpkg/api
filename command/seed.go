@@ -8,8 +8,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gostartkit/api/config"
-	"github.com/gostartkit/api/repository"
+	"github.com/webpkg/api/config"
+	"github.com/webpkg/api/repository"
 	"github.com/webpkg/cmd"
 )
 

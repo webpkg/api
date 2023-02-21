@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gostartkit/api/config"
+	"github.com/webpkg/api/config"
 )
 
 var (

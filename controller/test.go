@@ -8,9 +8,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gostartkit/api/model"
-	"github.com/gostartkit/api/proxy"
-	"github.com/gostartkit/api/validator"
+	"github.com/webpkg/api/model"
+	"github.com/webpkg/api/proxy"
+	"github.com/webpkg/api/validator"
 	"github.com/webpkg/web"
 )
 

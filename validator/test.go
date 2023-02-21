@@ -5,7 +5,7 @@
 package validator
 
 import (
-	"github.com/gostartkit/api/model"
+	"github.com/webpkg/api/model"
 )
 
 // CreateTest validate create test

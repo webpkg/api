@@ -1,4 +1,4 @@
-module github.com/gostartkit/api
+module github.com/webpkg/api
 
 go 1.13
 

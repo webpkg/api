@@ -5,8 +5,8 @@
 package proxy
 
 import (
-	"github.com/gostartkit/api/model"
-	"github.com/gostartkit/api/repository"
+	"github.com/webpkg/api/model"
+	"github.com/webpkg/api/repository"
 )
 
 var (

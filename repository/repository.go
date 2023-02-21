@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gostartkit/api/config"
-	"github.com/gostartkit/api/helper"
+	"github.com/webpkg/api/config"
+	"github.com/webpkg/api/helper"
 	"github.com/webpkg/web"
 )
 
