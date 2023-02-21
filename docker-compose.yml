@@ -1,41 +1,45 @@
 version: "3"
 services:
 
-    redis:
-      image: redis:alpine
-      container_name: redis
-      restart: always
-      ports:
-        - "6379"
-
     database:
       image: mysql:5.7
-      container_name: mysql
+      container_name: api-database
       volumes:
         - data:/var/lib/mysql
       restart: always
       environment:
-        - MYSQL_ROOT_PASSWORD=xNUvRi3nfuU
+        - MYSQL_ROOT_PASSWORD=5ZSufRefgMFpJCH
         - MYSQL_DATABASE=api
         - MYSQL_USER=api
-        - MYSQL_PASSWORD=TfqrI4KdYzjpINoR
+        - MYSQL_PASSWORD=w2gqZIUNjap
       ports:
         - "3306:3306"
 
-    web:
+    app:
       build:
         context: ./
-      image: hub.hirefromchina.com/api
-      container_name: web
+      image: hub.gostartkit.com/api
+      container_name: api-app
       depends_on:
         - database
-        - redis
       working_dir: /app
       volumes:
           - .:/app
       restart: always
+
+    web:
+      image: nginx:alpine
+      container_name: api-web
+      depends_on:
+        - app
+      working_dir: /app
+      volumes:
+          - .:/app
+          - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+          - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+      restart: always
       ports:
-       - "80:8443"
+       - "80:80"
 
 volumes:
   data:

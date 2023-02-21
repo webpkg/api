@@ -1,8 +1,12 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package middleware
 
 import (
-	"github.com/webpkg/api/proxy"
-	"github.com/webpkg/api/rbac"
+	"github.com/gostartkit/api/proxy"
+	"github.com/gostartkit/api/rbac"
 	"github.com/webpkg/web"
 )
 
@@ -44,8 +48,7 @@ func Direct(next web.Callback, keys ...string) web.Callback {
 
 // before call before controller action
 func before(ctx *web.Context) {
-	ctx.SetContentType("application/json; charset=utf-8")
-	ctx.SetHeader("access-control-allow-origin", "*")
+	ctx.AcceptContentType()
 }
 
 // after call after controller action
@@ -56,12 +59,10 @@ func after(ctx *web.Context) {
 // bearerAuth bearer authorization
 func bearerAuth(ctx *web.Context, keys ...string) error {
 
-	auth := ctx.GetHeader("Authorization")
+	accessToken := rbac.ParseBearerToken(ctx.Get("Authorization"))
 
-	accessToken, err := rbac.TryParseBearerToken(auth)
-
-	if err != nil {
-		return err
+	if accessToken == "" {
+		return web.ErrUnauthorized
 	}
 
 	cat, err := proxy.GetAuthByAccessToken(accessToken)
@@ -70,9 +71,9 @@ func bearerAuth(ctx *web.Context, keys ...string) error {
 		return err
 	}
 
-	ctx.UserID = cat.UserID
+	ctx.Init(cat.UserID, cat.UserRight)
 
-	if !rbac.Check(cat.Right, keys...) {
+	if !rbac.Check(cat.UserRight, keys...) {
 		return web.ErrForbidden
 	}
 

@@ -2,13 +2,14 @@
 // Use of this source code is governed by a AGPL
 // license that can be found in the LICENSE file.
 // https://gostartkit.com
-package main
+package helper
 
 import (
-	"github.com/gostartkit/api/command"
-	_ "github.com/webpkg/mysql"
+	"errors"
 )
 
-func main() {
-	command.Run()
-}
+var (
+	ErrModelInvalid  = errors.New("model invalid")
+	ErrModelExist    = errors.New("model already exists")
+	ErrModelNotExist = errors.New("model does not exist")
+)

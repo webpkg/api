@@ -1,28 +1,29 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package config
 
-import "sort"
+import (
+	"sort"
+	"strings"
+)
 
 // CreateRbacConfig return *[]KeyValuePair
 func CreateRbacConfig() *RbacConfig {
 
 	cfg := &RbacConfig{
 		{
-			Key:   "test.all",
+			Key:   "right.all",
 			Value: 1,
 		},
 		{
-			Key:   "test.edit",
+			Key:   "right.edit",
 			Value: 2,
 		},
-		{
-			Key:   "right.all",
-			Value: 4,
-		},
-		{
-			Key:   "right.edit",
-			Value: 8,
-		},
 	}
+
+	sort.Sort(cfg)
 
 	return cfg
 }
@@ -45,7 +46,7 @@ func (o *RbacConfig) Swap(i, j int) { (*o)[i], (*o)[j] = (*o)[j], (*o)[i] }
 // Less compare i, j
 func (o *RbacConfig) Less(i, j int) bool { return (*o)[i].Key < (*o)[j].Key }
 
-// Search uses binary search to find and return the smallest index Value
+// Search use binary search to find and return the smallest index Value
 func (o *RbacConfig) Search(key string) int64 {
 
 	i := sort.Search(o.Len(), func(i int) bool { return (*o)[i].Key >= key })
@@ -55,4 +56,27 @@ func (o *RbacConfig) Search(key string) int64 {
 	}
 
 	return 0
+}
+
+// Sum sum right.value
+func (o *RbacConfig) Sum() int64 {
+	var val int64 = 0
+	for i := 0; i < o.Len(); i++ {
+		val += (*o)[i].Value
+	}
+	return val
+}
+
+// Keys get keys by userRight
+func (o *RbacConfig) Keys(userRight int64) string {
+	var sb strings.Builder
+	for i := 0; i < o.Len(); i++ {
+		if (*o)[i].Value&userRight > 0 {
+			if sb.Len() > 0 {
+				sb.WriteByte(',')
+			}
+			sb.WriteString((*o)[i].Key)
+		}
+	}
+	return sb.String()
 }

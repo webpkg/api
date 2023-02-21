@@ -1,18 +1,18 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package validator
 
 import (
-	"github.com/webpkg/api/model"
+	"github.com/gostartkit/api/model"
 )
 
 // CreateTest validate create test
 func CreateTest(test *model.Test) error {
 
-	if test.ID != 0 {
-		return CreateValidationError("id", "invalid")
-	}
-
 	if test.TestName == "" {
-		return CreateValidationError("testName", "required")
+		return CreateRequiredError("testName")
 	}
 
 	return nil
@@ -22,21 +22,31 @@ func CreateTest(test *model.Test) error {
 func UpdateTest(test *model.Test) error {
 
 	if test.ID == 0 {
-		return CreateValidationError("id", "invalid")
-	}
-
-	if test.TestName == "" {
-		return CreateValidationError("testName", "required")
+		return CreateRequiredError("id")
 	}
 
 	return nil
 }
 
-// UpdateTestStatus validate update test Status
+// UpdateTestPartial validate update test part
+func UpdateTestPartial(test *model.Test, attrsName ...string) error {
+
+	if test.ID == 0 {
+		return CreateRequiredError("id")
+	}
+
+	if len(attrsName) == 0 {
+		return CreateRequiredError("attrs")
+	}
+
+	return nil
+}
+
+// UpdateTestStatus validate update test status
 func UpdateTestStatus(test *model.Test) error {
 
 	if test.ID == 0 {
-		return CreateValidationError("id", "invalid")
+		return CreateRequiredError("id")
 	}
 
 	return nil

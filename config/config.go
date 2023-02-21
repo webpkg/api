@@ -1,29 +1,118 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package config
 
 import (
 	"errors"
-	"log"
+	"fmt"
+	"sort"
+	"sync"
+	"time"
 
-	"github.com/webpkg/api/helper"
+	"github.com/gostartkit/api/helper"
 )
 
 const (
-	_configFile   = "config.json"
+	_configFile = "config.json"
+	_key        = "api"
 )
 
-// WebConfig struct
-type WebConfig struct {
+var (
+	_authUrl      string = ""
+	_timeLocation *time.Location
+	_webConfig    *webConfig
+	_once         sync.Once
+)
+
+// Init config
+func Init() error {
+
+	var err error
+
+	_once.Do(func() {
+		_webConfig, err = readConfig()
+
+		if err == nil {
+			_timeLocation, err = time.LoadLocation(_webConfig.App.TimeLocation)
+		}
+	})
+
+	return err
+}
+
+// App get AppConfig
+func App() *AppConfig {
+	return _webConfig.App
+}
+
+// Server get ServerConfig
+func Server() *ServerConfig {
+	return _webConfig.Server
+}
+
+// Database get DatabaseClusterConfig
+func Database() *DatabaseCluster {
+	return _webConfig.Database
+}
+
+// Rbac get RbacConfig
+func Rbac() *RbacConfig {
+	return _webConfig.Rbac
+}
+
+// Key get Key
+func Key() string {
+	return _key
+}
+
+// TimeLocation get time location
+func TimeLocation() *time.Location {
+	return _timeLocation
+}
+
+// TimeLayout get time layout
+func TimeLayout() string {
+
+	if _webConfig.App.TimeLayout == "" {
+		return "2006-01-02 15:04:05"
+	}
+
+	return _webConfig.App.TimeLayout
+}
+
+// AuthUrl get auth url
+func AuthUrl() string {
+
+	if _authUrl == "" {
+
+		env := _webConfig.App.AppEnv
+		domain := _webConfig.App.Domain
+
+		switch env {
+		case "prod", "product":
+			_authUrl = fmt.Sprintf("https://api.%s/auth/authorize/%s", domain, Key())
+		default:
+			_authUrl = fmt.Sprintf("https://%s-api.%s/auth/authorize/%s", env, domain, Key())
+		}
+	}
+
+	return _authUrl
+}
+
+// webConfig struct
+type webConfig struct {
 	App      *AppConfig
 	Server   *ServerConfig
 	Database *DatabaseCluster
-	Auth     *AuthConfig
 	Rbac     *RbacConfig
 }
 
 // WriteConfig create new config.json at $configDir
-func WriteConfig() {
+func WriteConfig(force bool) error {
 
-	cfg := &WebConfig{}
+	cfg := &webConfig{}
 
 	cfg.App = CreateAppConfig()
 
@@ -31,45 +120,56 @@ func WriteConfig() {
 
 	cfg.Database = CreateDatabaseClusterConfig()
 
-	cfg.Auth = CreateAuthConfig()
-
 	// cfg.Rbac = CreateRbacConfig()
 
-	if err := helper.WriteJSON(cfg, _configFile, false); err != nil {
-		log.Printf("config: %v", err)
+	if err := helper.WriteJSON(_configFile, cfg, force); err != nil {
+		return err
 	}
+
+	return nil
 }
 
-// ReadConfig read $configDir/config.json
-func ReadConfig() (*WebConfig, error) {
+// readConfig read $configDir/config.json
+func readConfig() (*webConfig, error) {
 
-	c := &WebConfig{}
+	c := &webConfig{}
 
-	err := helper.ReadJSON(c, _configFile)
+	if helper.FileExist(_configFile) {
 
-	if err != nil {
-		return nil, err
+		if err := helper.ReadJSON(_configFile, c); err != nil {
+			return nil, err
+		}
+	}
+
+	if c.App == nil {
+		c.App = CreateAppConfig()
 	}
 
 	if c.Server == nil {
-		return nil, errors.New("config.Server is nil")
+		c.Server = CreateServerConfig()
 	}
 
 	if c.Database == nil {
-		return nil, errors.New("config.Database is nil")
+		c.Database = CreateDatabaseClusterConfig()
 	}
 
 	if c.Database.Write == nil {
 		return nil, errors.New("config.Database.Write is nil")
 	}
 
-	if c.Auth == nil {
-		return nil, errors.New("config.Auth is nil")
+	if c.Database.Read == nil {
+		return nil, errors.New("config.Database.Read is nil")
+	}
+
+	if len(*c.Database.Read) == 0 {
+		return nil, errors.New("config.Database.Read len is 0")
 	}
 
 	if c.Rbac == nil {
 		c.Rbac = CreateRbacConfig()
 	}
+
+	sort.Sort(c.Rbac)
 
 	return c, nil
 }

@@ -1,61 +1,63 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package proxy
 
 import (
-	"github.com/webpkg/api/model"
-	"github.com/webpkg/api/repository"
+	"github.com/gostartkit/api/model"
+	"github.com/gostartkit/api/repository"
 )
 
-// CreateTestID generate a new testID
-func CreateTestID() uint64 {
-	repo := repository.CreateTestRepository()
-	return repo.CreateTestID()
+var (
+	testRepository = repository.CreateTestRepository()
+)
+
+// CreateTestID return test.ID error
+func CreateTestID() (uint64, error) {
+	return testRepository.CreateTestID()
 }
 
-// GetTestsByKey get tests by key
-func GetTestsByKey(key string, page int, pageSize int) (*model.TestCollection, error) {
-	repo := repository.CreateTestRepository()
-	return repo.GetTestsByKey(key, page, pageSize)
+// GetTests return *model.TestCollection, error
+func GetTests(filter string, orderBy string, page int, pageSize int) (*model.TestCollection, error) {
+	return testRepository.GetTests(filter, orderBy, page, pageSize)
 }
 
-// GetTest by id uint64
+// GetTest return *model.Test, error
 func GetTest(id uint64) (*model.Test, error) {
-	repo := repository.CreateTestRepository()
-	return repo.GetTest(id)
+	return testRepository.GetTest(id)
 }
 
-// CreateTest ID, TestName, TestDescription, Status, CreatedAt
-// return uint64, error
-func CreateTest(test *model.Test) (uint64, error) {
-	repo := repository.CreateTestRepository()
-	return repo.CreateTest(test)
+// CreateTest return int64, error
+// Attributes: ID uint64, TestName string, TestDescription *string, Status int
+func CreateTest(test *model.Test) (int64, error) {
+	return testRepository.CreateTest(test)
 }
 
-// UpdateTest return rowsAffected, error
-// SET TestName, TestDescription, Status, UpdatedAt
-// WHERE ID
+// UpdateTest return int64, error
+// Attributes: TestName string, TestDescription *string, Status int
 func UpdateTest(test *model.Test) (int64, error) {
-	repo := repository.CreateTestRepository()
-	return repo.UpdateTest(test)
+	return testRepository.UpdateTest(test)
 }
 
-// UpdateTestStatus return rowsAffected, error
-// SET status
-// WHERE ID
+// UpdateTestPartial return int64, error
+// Attributes: TestName string, TestDescription *string, Status int
+func UpdateTestPartial(test *model.Test, attrsName ...string) (int64, error) {
+	return testRepository.UpdateTestPartial(test, attrsName...)
+}
+
+// UpdateTestStatus return int64, error
+// Attributes: Status int
 func UpdateTestStatus(test *model.Test) (int64, error) {
-	repo := repository.CreateTestRepository()
-	return repo.UpdateTestStatus(test)
+	return testRepository.UpdateTestStatus(test)
 }
 
-// DestroyTest return rowsAffected, error
-// WHERE id uint64
+// DestroyTest return int64, error
 func DestroyTest(id uint64) (int64, error) {
-	repo := repository.CreateTestRepository()
-	return repo.DestroyTest(id)
+	return testRepository.DestroyTest(id)
 }
 
-// DestroyTestSoft return rowsAffected, error
-// WHERE id uint64
+// DestroyTest return int64, error
 func DestroyTestSoft(id uint64) (int64, error) {
-	repo := repository.CreateTestRepository()
-	return repo.DestroyTestSoft(id)
+	return testRepository.DestroyTestSoft(id)
 }

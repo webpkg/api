@@ -1,3 +1,7 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package helper
 
 import (
@@ -5,9 +9,9 @@ import (
 	"time"
 )
 
-const _charsetRand = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$"
+const _charsetRand = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-var _seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+var _seededRand = rand.New(rand.NewSource(time.Now().Unix()))
 
 // RandStringWithCharset rand string with charset
 func RandStringWithCharset(length int, charset string) string {

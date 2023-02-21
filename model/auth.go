@@ -1,3 +1,7 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package model
 
 // CreateAuth return *Auth
@@ -10,8 +14,8 @@ func CreateAuth() *Auth {
 
 // Auth model
 type Auth struct {
-	UserID uint64 `json:"userID"`
-	Right  int64  `json:"right"`
+	UserID    uint64 `json:"userID"`
+	UserRight int64  `json:"userRight"`
 }
 
 // CreateAuthCollection return *AuthCollection

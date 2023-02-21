@@ -1,3 +1,7 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package route
 
 import (
@@ -6,17 +10,15 @@ import (
 	"github.com/webpkg/web"
 )
 
-const (
-	prefix = ""
-)
-
 var (
-	_once sync.Once
+	_once   sync.Once
+	_prefix string
 )
 
-// Init config
+// Init route init
 func Init(app *web.Application) {
 	_once.Do(func() {
-		testRoute(app, prefix)
+		dataRoute(app, _prefix)
+		testRoute(app, _prefix)
 	})
 }

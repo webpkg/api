@@ -1,9 +1,10 @@
+
 package model
 
 import "time"
 
-// CreateTest return *Test
-func CreateTest() *Test {
+// NewTest return *Test
+func NewTest() *Test {
 
 	test := &Test{}
 
@@ -11,22 +12,23 @@ func CreateTest() *Test {
 }
 
 // Test model
-// @table tests
+// @Entity tableName="tests"
 type Test struct {
-	// @column PrimaryKey
+	// @PrimaryKey
     ID uint64 `json:"id"`
-	// @column $dataType=varchar(127)
+	// @DataType varchar(127)
 	TestName string `json:"testName"`
+	// @Column dataType=varchar(255)
 	TestDescription *string `json:"testDescription"`
-	// lt 0 deleted, 0 pendding, 1 valid
+	// @Comment "lt 0 deleted, 0 pendding, 1 valid"
 	Status    int        `json:"status"`
-	DeletedAt *time.Time `json:"-"`
+	DeletedAt *time.Time `json:"deletedAt"`
 	CreatedAt *time.Time `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
 }
 
-// CreateTestCollection return *TestCollection
-func CreateTestCollection() *TestCollection {
+// NewTestCollection return *TestCollection
+func NewTestCollection() *TestCollection {
 
 	testCollection := &TestCollection{}
 

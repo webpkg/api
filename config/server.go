@@ -1,11 +1,19 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package config
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // CreateServerConfig create server config
 func CreateServerConfig() *ServerConfig {
 	cfg := &ServerConfig{
-		Addr:              "web:8443",
+		Network:           "unix",
+		Addr:              fmt.Sprintf("./log/%s.sock", Key()),
 		ReadTimeout:       32,
 		ReadHeaderTimeout: 8,
 		WriteTimeout:      32,
@@ -16,6 +24,7 @@ func CreateServerConfig() *ServerConfig {
 
 // ServerConfig struct
 type ServerConfig struct {
+	Network           string
 	Addr              string
 	ReadTimeout       time.Duration
 	ReadHeaderTimeout time.Duration

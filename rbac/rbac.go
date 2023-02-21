@@ -1,12 +1,14 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package rbac
 
 import (
-	"sort"
 	"strings"
 	"sync"
 
-	"github.com/webpkg/api/config"
-	"github.com/webpkg/web"
+	"github.com/gostartkit/api/config"
 )
 
 var (
@@ -15,32 +17,31 @@ var (
 )
 
 // Init config
-func Init(rbacConfig *config.RbacConfig) {
+func Init() {
 	_once.Do(func() {
-		_rights = rbacConfig
-		sort.Sort(_rights)
+		_rights = config.Rbac()
 	})
 }
 
-// TryParseBearerToken return token
-func TryParseBearerToken(auth string) (string, error) {
+// ParseBearerToken return token
+func ParseBearerToken(auth string) string {
 	const prefix = "Bearer "
+	l := len(prefix)
 
-	if len(auth) < len(prefix) || !strings.EqualFold(auth[:len(prefix)], prefix) {
-		return "", web.ErrUnauthorized
+	if len(auth) < l || !strings.EqualFold(auth[:l], prefix) {
+		return ""
 	}
 
-	token := auth[len(prefix):]
-
-	if token == "" {
-		return "", web.ErrUnauthorized
-	}
-
-	return token, nil
+	return auth[l:]
 }
 
 // Check check right
 func Check(userRight int64, keys ...string) bool {
+
+	if len(keys) == 0 {
+		return userRight > 0
+	}
+
 	return checkKeys(userRight, keys...)
 }
 
@@ -61,7 +62,13 @@ func checkKey(userRight int64, key string) bool {
 	orKeys := strings.Split(key, "|")
 
 	for _, orKey := range orKeys {
+
+		if orKey == "" {
+			return userRight > 0
+		}
+
 		val := getVal(orKey)
+
 		if val > 0 {
 			return val&userRight > 0
 		}

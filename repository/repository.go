@@ -1,3 +1,7 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package repository
 
 import (
@@ -7,94 +11,101 @@ import (
 	"sync"
 	"time"
 
-	"github.com/webpkg/api/config"
-	"github.com/webpkg/api/helper"
+	"github.com/gostartkit/api/config"
+	"github.com/gostartkit/api/helper"
+	"github.com/webpkg/web"
 )
 
 const (
-	_pageSize    = 20
+	_pageSize    = 10
 	_maxPageSize = 1000
 )
 
 var (
-	_webConfig     *config.WebConfig
 	_writeDatabase *sql.DB
 	_readDatabases []*sql.DB
 	_once          sync.Once
 )
 
 // Init config
-func Init(WebConfig *config.WebConfig) {
-	_once.Do(func() {
-		_webConfig = WebConfig
-		_writeDatabase = openWriteDatabase()
-		_readDatabases = openReadDatabases()
-	})
-}
+func Init() error {
+	var err error
 
-// WebConfig get WebConfig
-func WebConfig() *config.WebConfig {
-	return _webConfig
+	_once.Do(func() {
+		_writeDatabase, err = openWriteDatabase()
+
+		if err == nil {
+			_readDatabases, err = openReadDatabases()
+		}
+	})
+
+	return err
 }
 
 // Close databases
 func Close() error {
+	var err error
 
 	if _writeDatabase != nil {
-		err := _writeDatabase.Close()
-		log.Printf("close: %v\n", err)
-	}
-
-	for i, r := range _readDatabases {
-		if r != nil {
-			err := r.Close()
-			log.Printf("close(%d): %v\n", i, err)
+		if err1 := _writeDatabase.Close(); err1 != nil {
+			err = err1
 		}
 	}
 
-	return nil
+	for _, r := range _readDatabases {
+		if r != nil {
+			if err1 := r.Close(); err1 != nil {
+				err = err1
+			}
+		}
+	}
+
+	return err
 }
 
 // openWriteDatabase of config.database.write
-func openWriteDatabase() *sql.DB {
-	db, err := sql.Open(_webConfig.Database.Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
-		_webConfig.Database.Username,
-		_webConfig.Database.Password,
-		_webConfig.Database.Write.Host,
-		_webConfig.Database.Write.Port,
-		_webConfig.Database.Database,
-		_webConfig.Database.Charset))
+func openWriteDatabase() (*sql.DB, error) {
+	db, err := sql.Open(config.Database().Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
+		config.Database().Username,
+		config.Database().Password,
+		config.Database().Write.Host,
+		config.Database().Write.Port,
+		config.Database().Database,
+		config.Database().Charset))
 
 	if err != nil {
-		log.Fatalf("openWriteDatabase: %s\n", err)
+		return nil, err
 	}
 
-	return db
+	db.SetMaxIdleConns(0)
+
+	return db, nil
 }
 
 // openReadDatabases of config.database.read
-func openReadDatabases() []*sql.DB {
+func openReadDatabases() ([]*sql.DB, error) {
 
 	var readDatabases []*sql.DB
 
-	for _, r := range *_webConfig.Database.Read {
-		db, err := sql.Open(_webConfig.Database.Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
-			_webConfig.Database.Username,
-			_webConfig.Database.Password,
+	for _, r := range *config.Database().Read {
+		db, err := sql.Open(config.Database().Driver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
+			config.Database().Username,
+			config.Database().Password,
 			r.Host,
 			r.Port,
-			_webConfig.Database.Database,
-			_webConfig.Database.Charset))
+			config.Database().Database,
+			config.Database().Charset))
 
 		if err != nil {
-			log.Printf("openReadDatabases(%s:%d): %v\n", r.Host, r.Port, err)
-			continue
+			return nil, err
 		}
+
+		db.SetMaxIdleConns(0)
 
 		readDatabases = append(readDatabases, db)
 	}
 
-	return readDatabases
+	return readDatabases, nil
 }
 
 func selectDB(databaseCluster []*sql.DB) *sql.DB {
@@ -102,7 +113,17 @@ func selectDB(databaseCluster []*sql.DB) *sql.DB {
 }
 
 func query(query string, args ...interface{}) (*sql.Rows, error) {
-	return selectDB(_readDatabases).Query(query, args...)
+
+	rows, err := selectDB(_readDatabases).Query(query, args...)
+
+	if err != nil {
+		if config.App().AppDebug {
+			log.Printf("query: %s\n", query)
+		}
+		return nil, err
+	}
+
+	return rows, nil
 }
 
 func queryRow(query string, args ...interface{}) *sql.Row {
@@ -110,19 +131,57 @@ func queryRow(query string, args ...interface{}) *sql.Row {
 }
 
 func prepare(query string) (*sql.Stmt, error) {
-	return _writeDatabase.Prepare(query)
+
+	stmt, err := _writeDatabase.Prepare(query)
+
+	if err != nil {
+		if config.App().AppDebug {
+			log.Printf("prepare: %s\n", query)
+		}
+		return nil, err
+	}
+
+	return stmt, nil
 }
 
 func txPrepare(tx *sql.Tx, query string) (*sql.Stmt, error) {
-	return tx.Prepare(query)
+
+	stmt, err := tx.Prepare(query)
+
+	if err != nil {
+		if config.App().AppDebug {
+			log.Printf("txPrepare: %s\n", query)
+		}
+		return nil, err
+	}
+
+	return stmt, nil
 }
 
 func stmtExec(stmt *sql.Stmt, args ...interface{}) (sql.Result, error) {
-	return stmt.Exec(args...)
+
+	result, err := stmt.Exec(args...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func exec(query string, args ...interface{}) (sql.Result, error) {
-	return _writeDatabase.Exec(query, args...)
+
+	result, err := _writeDatabase.Exec(query, args...)
+
+	if err != nil {
+		if config.App().AppDebug {
+			log.Printf("exec: %s\n", query)
+			log.Printf("args: %v\n", args)
+		}
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func begin() (*sql.Tx, error) {
@@ -130,7 +189,18 @@ func begin() (*sql.Tx, error) {
 }
 
 func txExec(tx *sql.Tx, query string, args ...interface{}) (sql.Result, error) {
-	return tx.Exec(query, args...)
+
+	result, err := tx.Exec(query, args...)
+
+	if err != nil {
+		if config.App().AppDebug {
+			log.Printf("txExec: %s\n", query)
+			log.Printf("args: %v\n", args)
+		}
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func rollback(tx *sql.Tx) error {
@@ -142,15 +212,15 @@ func commit(tx *sql.Tx) error {
 }
 
 func now() *time.Time {
-	return helper.Now()
+	return web.Now()
 }
 
 // max get max key value
-func max(tableName string, key string) (uint64, error) {
+func max(tableName string, key string, appID uint64, appNum uint64) (uint64, error) {
 
 	sqlx := "SELECT MAX(`" + key + "`) FROM `" + tableName + "` WHERE `" + key + "` % ? = ? "
 
-	row := queryRow(sqlx, WebConfig().App.AppNum, WebConfig().App.AppID)
+	row := queryRow(sqlx, appNum, appID)
 
 	var val *uint64
 

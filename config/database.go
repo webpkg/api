@@ -1,4 +1,10 @@
+// Copyright 2023 The GoStartKit Authors. All rights reserved.
+// Use of this source code is governed by a AGPL
+// license that can be found in the LICENSE file.
+// https://gostartkit.com
 package config
+
+import "github.com/gostartkit/api/helper"
 
 var (
 	_connection = "mysql"
@@ -6,7 +12,6 @@ var (
 	_port       = 3306
 	_database   = "api"
 	_username   = "api"
-	_password   = "TfqrI4KdYzjpINoR"
 	_charset    = "utf8"
 	_collation  = "utf8_general_ci"
 )
@@ -17,7 +22,7 @@ func CreateDatabaseClusterConfig() *DatabaseCluster {
 		Driver:    _connection,
 		Database:  _database,
 		Username:  _username,
-		Password:  _password,
+		Password:  helper.CreateToken(),
 		Charset:   _charset,
 		Collation: _collation,
 	}
